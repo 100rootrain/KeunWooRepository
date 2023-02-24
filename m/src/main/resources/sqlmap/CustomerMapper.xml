@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.CustomerDAO">
+	<select id="selectCustomerList" parameterType="map"
+		resultType="map">
+		SELECT
+		CUST_NO,
+		NAME,
+		BIRTH,
+		ADDRESS,
+		CONTACT
+		FROM XTB_CUSTOMER
+		WHERE 1=1
+		<if test="name != ''">
+			AND NAME LIKE '%' || '${name}' || '%'
+		</if>
+	</select>
+
+	<select id="selectCustomerDetail" parameterType="map"
+		resultType="map">
+		SELECT
+		CUST_NO,
+		NAME,
+		BIRTH,
+		ADDRESS,
+		CONTACT
+		FROM XTB_CUSTOMER
+		WHERE CUST_NO='${custNo}'
+
+	</select>
+
+	<update id='customerInsert' parameterType='map'>
+
+		INSERT INTO
+		XTB_CUSTOMER
+		(CUST_NO,
+		NAME,
+		BIRTH,
+		ADDRESS,
+		CONTACT)
+		VALUES(CUST_SEQ.NEXTVAL, '${name}',
+		'${birth}', '${address}',
+		'${contact}')
+
+	</update>
+	<update id='customerInsert2' parameterType='map'>
+
+		UPDATE XTB_CUSTOMER
+		SET
+		NAME='${name}',
+		BIRTH='${birth}',
+		ADDRESS= '${address}',
+		CONTACT='${contact}'
+		WHERE CUST_NO='${custNo}'
+	</update>
+
+
+
+
+
+</mapper>

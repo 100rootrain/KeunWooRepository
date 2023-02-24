@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.RsvDAO">
+	<!-- 들어가는거 나오는거 -->
+	<!-- id는 메서드명 메퍼에는 가급적이면 *을 쓰지않고 명시적으로 다 써주자.-->
+	<select id="selectRsvList" parameterType="map" resultType="map">
+		SELECT
+		RSV_NO,
+		NAME,
+		RSV_DT,
+		CONTACT
+		FROM TB_RESERVATION
+		WHERE 1=1
+		<if test="chk == 'false'">
+			AND STAT != '2' <!-- 히스토리성 데이터는 취소된거안보이게 -->
+		</if>
+		<if test="name != ''">
+			AND NAME LIKE '%' || '${name}' || '%'
+		</if>
+	</select>
+
+	<select id="selectRsvDetail" parameterType="map"
+		resultType="map">
+		SELECT
+		RSV_NO,
+		NAME,
+		RSV_DT,
+		RSV_TM,
+		RSV_HR,
+		CONTACT,
+		HEAD_CNT,
+		REMARK,
+		CASE WHEN STAT=2 THEN '취소' WHEN STAT=3 THEN '완료' ELSE '예약' END 
+		<!-- 1 : 예약 2 : 취소 3 : 완료 -->
+		STAT
+		FROM TB_RESERVATION
+		WHERE RSV_NO='${rsvNo}'
+
+	</select>
+
+	<update id="updateCancel" parameterType="map">
+		<!-- 취소했을때 취소시간이 들어가야됨 -->
+		UPDATE TB_RESERVATION SET
+		STAT
+		= '${stat}',
+		CANCEL_FEE ='${fee}', <!-- 완료되면 
+			fee가 들어가면안되니깐 -->
+		CANCEL_TM = sysdate
+		WHERE
+		RSV_NO='${rsvNo}'
+
+	</update>
+
+	<update id="updateDone" parameterType="map">
+		<!-- 완료일때 완료시간이 들어가야됨 -->
+		UPDATE TB_RESERVATION SET
+		STAT
+		= '${stat}',
+		DONE_TM = sysdate
+		WHERE
+		RSV_NO='${rsvNo}'
+
+	</update>
+
+	<update id="updateInfo" parameterType="map">
+		UPDATE TB_RESERVATION SET
+		NAME = '${name}',
+		RSV_DT= '${rsvDt}',
+		RSV_TM=
+		'${rsvTm}',
+		RSV_HR='${rsvHr}',
+		CONTACT='${contact}',
+		HEAD_CNT='${headCnt}',
+		REMARK='${remark}'
+		WHERE RSV_NO='${rsvNo}'
+		<!-- ',' 조심 -->
+	</update>
+	<select id="selectRsvStat" parameterType="string"
+		resultType="map">
+		SELECT STAT,
+		TM,
+		CASE
+		WHEN TM > 72 THEN 0 <!-- 3일 이상 남았으면 수수료 0 -->
+		WHEN TM > 36 AND 72 &lt; TM THEN 30 <!-- 36시간~3일 남았으면 수수료 30 -->
+		WHEN TM > 12 AND 36 &lt; TM THEN 50 <!-- 12시간~36시간 남았으면 수수료 50 -->
+		ELSE 100 END FEE <!-- 12시간 이하 남았으면 수수료 100 -->
+		FROM (
+		SELECT STAT,
+		ROUND((TO_DATE(RSV_DT || RSV_TM, 'YYYYMMDDHH24MISS')
+		- SYSDATE)
+		* 24,
+		2) TM
+		FROM TB_RESERVATION
+		WHERE RSV_NO ='${rsvNo}')
+		<!-- map이면 키'${}', String이면 '${value}' mapper에 ';' 들어가면안됨 -->
+	</select>
+
+
+
+</mapper>

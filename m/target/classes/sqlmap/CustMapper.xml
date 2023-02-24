@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.CustDAO">
+	<select id="selectCustList" parameterType="map" resultType="map">
+		SELECT
+		CUST_NO,NAME,BIRTH FROM XTB_CUSTOMER
+		WHERE 1=1 <!-- 가짜조건 고정값 동적쿼리는 
+			and로시작 -->
+		<if test="txt != ''">
+			AND NAME LIKE '%' || '${txt}' || '%'
+		</if>
+	</select>
+
+	<select id="selectCustDetail" parameterType="map"
+		resultType="map">
+		SELECT
+		CUST_NO,NAME,BIRTH,CONTACT,ADDRESS FROM XTB_CUSTOMER
+		WHERE CUST_NO='${custNo}'
+	</select>
+
+	<update id="custDelete" parameterType="map"> <!-- 결과값 리턴안하니깐 필요없음 -->
+		DELETE FROM XTB_CUSTOMER
+		WHERE CUST_NO='${custNo}'
+	</update>
+
+	<!-- 숫자로 key 생성하는 방법 1. max+1 - 키가 삭제될 일이 없는 경우 - (SELECT NVL(MAX(CUST_NO),0)+1 
+		/* 회원이 없을경우 MAX값이 NULL이되므로 NVL로 해서 O값으로 바꿔줘야 새로 회원을 넣을때 1로 들어간다 */ FROM XTB_CUSTOMER) 
+		2. 시퀀스 사용 : 시퀀스.nextval -->
+	<update id="custInsert" parameterType="map"> <!-- 결과값 리턴안하니깐 필요없음 -->
+		INSERT INTO XTB_CUSTOMER (CUST_NO,NAME,BIRTH,CONTACT,ADDRESS) VALUES
+		(CUST_SEQ.NEXTVAL,'${name}','${birth}','${contact}','${address}')
+	</update>
+
+	<update id="custUpdate" parameterType="map">
+		UPDATE XTB_CUSTOMER SET
+		NAME = '${name}',
+		BIRTH = '${birth}',
+		CONTACT = '${contact}',
+		ADDRESS =
+		'${address}'
+		WHERE CUST_NO = '${custNo}'
+	</update>
+
+</mapper>

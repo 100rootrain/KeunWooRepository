@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.BkDAO">
+	<select id="getAccountList" parameterType="map" resultType="map">
+		SELECT * FROM (SELECT ACCNT_ID,
+		(SELECT CODE_NM FROM STB_CODE WHERE
+		CODE_GB = 'BANK' AND CODE_ID = BANK_CD) BANK_NM,
+		ACCNT_NO,
+		TO_CHAR(REG_DT, 'YYYY-MM-DD HH24:MI') REG_DT
+		FROM TB_BNK_ACCNT
+		)
+		WHERE
+		1=1
+		<if test="txt != ''">
+			<if test="type == 'name' ">
+				AND BANK_NM LIKE '%${txt}%'
+			</if>
+			<if test="type == 'accntNo'">
+				AND ACCNT_NO LIKE '%${txt}%'
+			</if>
+		</if>
+	</select>
+
+	<select id="getAccountDetail" parameterType="map"
+		resultType="map">
+		SELECT ACCNT_ID, BANK_CD, ACCNT_NO, PASS
+		FROM TB_BNK_ACCNT
+		WHERE
+		ACCNT_ID ='${accntId}'
+	</select>
+
+	<select id="getBankList" resultType="map"> <!-- selectbox의 값을 한번에 모두 넣기 때문에 parameterType이 필요없다. -->
+		SELECT CODE_ID ID, CODE_NM
+		NAME
+		FROM STB_CODE
+		WHERE CODE_GB = 'BANK'
+	</select>
+	<update id="deleteAccountInfo" parameterType="map">
+		DELETE FROM
+		TB_BNK_ACCNT WHERE ACCNT_ID ='${accntId}'
+	</update>
+
+	<update id="bkUpdate" parameterType="map">
+		UPDATE TB_BNK_ACCNT SET
+		BANK_CD='${bankCd}',
+		ACCNT_NO='${accntNo}',
+		REG_DT=SYSDATE
+		WHERE ACCNT_ID
+		='${accntId}'
+	</update>
+
+	<update id="bankInsertUpdate" parameterType="map"> <!-- 결과값 리턴안하니깐 필요없음 -->
+		MERGE INTO TB_BNK_ACCNT A <!-- 대상 테이블 -->
+		USING (
+		SELECT '${accntId}' ACCNT_ID,
+		'${pass}' PASS,
+		'${bankCd}'
+		BANK_CD,
+		'${accntNo}' ACCNT_NO,
+		SYSDATE REG_DT,
+		'${balance}' BALANCE
+		FROM
+		DUAL
+		) B <!-- 넣을 데이터 -->
+
+		ON (A.ACCNT_ID = B.ACCNT_ID)
+		WHEN MATCHED THEN  <!-- ON절에서 비교한 데이터가 존재하면 UPDATE -->
+		UPDATE
+		SET
+		A.PASS = B.PASS,
+		A.BANK_CD = B.BANK_CD,
+		A.ACCNT_NO =
+		B.ACCNT_NO,
+		A.REG_DT = B.REG_DT,
+		A.BALANCE = 0
+
+		WHEN NOT MATCHED THEN  <!-- 비교한 
+			값이 존재하지 않으면 -->
+
+		INSERT (A.ACCNT_ID, A.PASS, A.BANK_CD, A.ACCNT_NO, A.REG_DT,A.BALANCE)
+		VALUES (ACCNT_SEQ.NEXTVAL, B.PASS, B.BANK_CD, B.ACCNT_NO, B.REG_DT,0)
+	</update>
+
+
+
+	<select id="getAccntPwInfo" parameterType="map" resultType="map">
+		SELECT
+		PASS
+		FROM
+		TB_BNK_ACCNT
+		WHERE ACCNT_ID =
+		'${accntId}'
+	</select>
+
+	<select id="getAccntPwInfo2" parameterType="map"
+		resultType="map">  <!-- 비밀번호 암호화 했을때 되는 statement -->
+		SELECT CASE WHEN PASS = '${pass}' THEN 'O' ELSE 'X' END AS
+		PASS
+		FROM
+		TB_BNK_ACCNT
+		WHERE ACCNT_ID =
+		'${accntId}'
+
+	</select>
+
+	<update id="updateAccntPw" parameterType="map">
+		UPDATE TB_BNK_ACCNT SET
+		PASS =
+		'${accntPwChangeChk}' WHERE ACCNT_ID = '${accntId}'
+	</update>
+
+	<select id="AccntPwInfo" parameterType="map" resultType="String">
+		SELECT
+		PASS
+		FROM
+		TB_BNK_ACCNT
+		WHERE ACCNT_ID =
+		'${accntId}'
+	</select>
+
+	<select id="getBankAccountList" resultType="map"> <!-- selectbox의 값을 한번에 모두 넣기 때문에 parameterType이 필요없다. -->
+		SELECT *
+		FROM (SELECT (SELECT CODE_NM
+		FROM STB_CODE
+		WHERE CODE_GB =
+		'BANK'
+		AND CODE_ID = BANK_CD) BANK_NM,
+		ACCNT_ID ID,
+		ACCNT_NO NO
+		FROM
+		TB_BNK_ACCNT
+		)
+		WHERE 1 = 1
+	</select>
+
+	<select id="getBalanceInfo" parameterType="map" resultType="map">
+		SELECT BALANCE FROM TB_BNK_ACCNT WHERE ACCNT_ID='${accntId}'
+	</select>
+
+	<update id="getWithdrawMinus" parameterType="map">
+		UPDATE TB_BNK_ACCNT
+		SET
+		BALANCE =
+		NVL(BALANCE,0)-'${balance}' WHERE ACCNT_ID = '${accntId}'
+	</update>
+
+	<update id="getDepositPlus" parameterType="map">
+		UPDATE TB_BNK_ACCNT
+		SET
+		BALANCE =
+		NVL(BALANCE,0)+'${balance}' WHERE ACCNT_ID = '${accntId2}'
+
+	</update>
+
+	<update id="accntHistoryInsert" parameterType="map"> <!-- 히스토리 -->
+		INSERT INTO TB_ACCNT_HISTORY (HISTORY_ID,
+		WITHDRAW_NO,
+		DEPOSIT_NO,
+		REMITTANCE,
+		HISTORY_DT)
+		VALUES
+		(ACCNT_HISTORY.NEXTVAL,'${withdrawNo}','${depositNo}','${remittance}',SYSDATE)
+	</update>
+
+	<select id="getWithdrawResult" parameterType="map"
+		resultType="map">
+		SELECT * FROM (SELECT ACCNT_ID,
+		(SELECT CODE_NM FROM
+		STB_CODE WHERE
+		CODE_GB =
+		'BANK' AND CODE_ID = BANK_CD) BANK_NM,
+		ACCNT_NO,
+		BALANCE
+		FROM TB_BNK_ACCNT
+		)
+		WHERE ACCNT_ID ='${accntId}'
+	</select>
+
+	<update id="insertUser" parameterType="map"> <!-- MERGE INTO 연습 -->
+		MERGE INTO t_user A <!-- 대상 테이블 -->
+		USING (
+		SELECT '${id}' ID,
+		'${pw}' PW,
+		'${name}' NAME,
+		'${tel}' TEL,
+		'${email}' EMAIL,
+		'${address}' ADDRESS
+		FROM DUAL
+		) B <!-- 넣을 데이터 -->
+		ON (A.ID = B.ID)
+		WHEN MATCHED THEN  <!-- ON절에서 비교한 데이터가 존재하면 UPDATE -->
+		UPDATE
+		SET
+		A.PW = B.PW,
+		A.NAME = B.NAME,
+		A.TEL = B.TEL,
+		A.EMAIL = B.EMAIL,
+		A.ADDRESS = B.ADDRESS
+		WHEN NOT MATCHED THEN  <!-- 비교한 값이 존재하지 않으면 -->
+		INSERT (A.ID, A.PW, A.NAME, A.TEL, A.EMAIL, A.ADDRESS)
+		VALUES (B.ID,
+		B.PW, B.NAME, B.TEL, B.EMAIL, B.ADDRESS)
+	</update>
+
+	<select id="getBankstatements" resultType="map"
+		parameterType="map">
+		SELECT BANK_NM, TO_CHAR(HISTORY_DT,'YYYY-MM-DD HH24:MI:SS')
+		HISTORY_DT,
+		BANK_NM_CODE,
+		WITHDRAW_DEPOSIT, REMITTANCE,
+		ACCNT_NO
+		FROM
+		(SELECT
+		HISTORY_DT,
+		CASE WHEN
+		WITHDRAW_NO =
+		'${selectAccntId}' THEN
+		DEPOSIT_NO
+		WHEN DEPOSIT_NO
+		=
+		'${selectAccntId}'
+		THEN WITHDRAW_NO END AS
+		BANK_NM_CODE,
+		CASE WHEN
+		WITHDRAW_NO =
+		'${selectAccntId}' THEN '출금' WHEN
+		DEPOSIT_NO =
+		'${selectAccntId}' THEN
+		'입금'
+		END AS WITHDRAW_DEPOSIT,
+		REMITTANCE
+		FROM
+		TB_ACCNT_HISTORY
+		WHERE
+		WITHDRAW_NO = '${selectAccntId}'
+		OR
+		DEPOSIT_NO =
+		'${selectAccntId}') A,
+		(SELECT (SELECT CODE_NM
+		FROM STB_CODE
+		WHERE
+		CODE_GB =
+		'BANK'
+		AND CODE_ID =
+		BANK_CD) BANK_NM,
+		ACCNT_ID,
+		ACCNT_NO
+		FROM
+		TB_BNK_ACCNT
+		) B
+		WHERE B.ACCNT_ID
+		= A.BANK_NM_CODE
+
+		<if test="start != '' and end == ''">
+			AND HISTORY_DT >= TO_DATE('${start}','YYYY-MM-DD')
+		</if>
+		<if test="start == '' and end != ''">
+			AND HISTORY_DT &lt;= TO_DATE('${end}','YYYY-MM-DD')+1
+		</if>
+		<if test="start != '' and end != ''">
+			<!-- 둘 다 있는 경우 -->
+			AND HISTORY_DT BETWEEN TO_DATE('${start}','YYYY-MM-DD') AND
+			TO_DATE('${end}','YYYY-MM-DD')+1
+		</if>
+		ORDER BY HISTORY_DT DESC
+	</select>
+
+	<select id="getWithdrawDepositSum" resultType="map"
+		parameterType="map">
+		SELECT NVL((SELECT CASE WHEN WITHDRAW_DEPOSIT = '출금' THEN
+		SUM(NVL(REMITTANCE, 0)) END AS WITHDRAWSUM
+		FROM (SELECT HISTORY_DT,
+		CASE WHEN WITHDRAW_NO = '${selectAccntId}' THEN DEPOSIT_NO END AS
+		BANK_NM_CODE,
+		CASE WHEN WITHDRAW_NO = '${selectAccntId}' THEN '출금' END
+		AS WITHDRAW_DEPOSIT,
+		NVL(REMITTANCE, 0) AS REMITTANCE
+		FROM
+		TB_ACCNT_HISTORY
+		WHERE WITHDRAW_NO = '${selectAccntId}'
+		<if test="start != '' and end == ''">
+			AND HISTORY_DT >= TO_DATE('${start}','YYYY-MM-DD')
+		</if>
+		<if test="start == '' and end != ''">
+			AND HISTORY_DT &lt;= TO_DATE('${end}','YYYY-MM-DD')+1)
+		</if>
+		<if test="start != '' and end != ''">
+			AND HISTORY_DT BETWEEN TO_DATE('${start}','YYYY-MM-DD')
+			AND
+			TO_DATE('${end}','YYYY-MM-DD')+1)
+		</if>
+		GROUP BY WITHDRAW_DEPOSIT),0) DEPOSITSUM,
+		NVL((SELECT CASE WHEN
+		WITHDRAW_DEPOSIT = '입금' THEN SUM(NVL(REMITTANCE, 0)) END AS
+		DEPOSITSUM
+		FROM (SELECT HISTORY_DT,
+		CASE WHEN DEPOSIT_NO = '${selectAccntId}' THEN
+		WITHDRAW_NO END AS BANK_NM_CODE,
+		CASE WHEN DEPOSIT_NO =
+		'${selectAccntId}' THEN '입금' END AS WITHDRAW_DEPOSIT,
+		NVL(REMITTANCE,
+		0) AS REMITTANCE
+		FROM TB_ACCNT_HISTORY
+		WHERE DEPOSIT_NO =
+		'${selectAccntId}'
+		<if test="start != '' and end == ''">
+			AND HISTORY_DT >= TO_DATE('${start}','YYYY-MM-DD')
+		</if>
+		<if test="start == '' and end != ''">
+			AND HISTORY_DT &lt;= TO_DATE('${end}','YYYY-MM-DD')+1)
+		</if>
+		<if test="start != '' and end != ''">
+			<!-- 둘 다 있는 경우 -->
+			AND HISTORY_DT BETWEEN TO_DATE('${start}','YYYY-MM-DD') AND
+			TO_DATE('${end}','YYYY-MM-DD')+1)
+		</if>
+		GROUP BY WITHDRAW_DEPOSIT),0) WITHDRAWSUM
+		FROM DUAL
+
+
+	</select>
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.BulletinBoardDAO">
+
+	<!-- 1. DAO에서 실행된 메서드명과 동일한 id를 가진 쿼리가 실행된다. 그러므로 id 속성은 DAO 의 메소드명과 같아야 
+		한다. 2. parameterType은 string(소문자) 혹은 VO명 2. resultType은 VO의 상단에 선언한 alias명으로 
+		연결되므로 alias와 일치해야 한다. 3. 조회된 컬럼명과 resultType의 VO 안의 변수명도 일치해야 함 4. 컬럼명에 _가 
+		붙는 경우 자동으로 다음 문자가 대문자로 변환되어 VO에 들어감 ex> REG_DATE -> regDate, REG_USER -> 
+		regUSer -->
+
+	<select id="getBulletinBoardList" parameterType="map"
+		resultType="map"><!-- 게시판 조회 쿼리 -->
+		SELECT *
+		FROM(SELECT ROWNUM RN, M.*
+		FROM(
+		SELECT NO,
+		TITLE,
+		CONTENTS,
+		REG_USER,
+		TO_CHAR(REG_DATE, 'YYYY-MM-DD HH24:MI') REG_DATE,
+		VIEW_COUNT
+		FROM
+		TB_BULLETIN_BOARD
+		WHERE 1=1
+
+		<if test="txt != ''">
+			<if test="type == 'type_Name' "> <!-- 제목 -->
+				AND TITLE LIKE '%'||'${txt}'||'%'
+			</if>
+			<if test="type == 'type_User'"> <!-- 작성자 -->
+				AND
+				<foreach collection="arr" item="user" open="(" close=")"
+					separator=" OR"> <!-- LIKE 조건으로 여러개일 경우, item : 전달받은 인자 값을 alias 명으로 대체 -->
+					REG_USER LIKE '%'||'${user}'||'%'
+				</foreach>
+			</if>
+		</if>
+		<!-- #{a} : '값'으로 나옴, 로그상에 ?로 나옴 ${a} : 값 으로 나옴, 외따옴표를 따로 붙여줘야 함 -->
+
+
+
+		<!-- <if test="regUser2 != ''"> = 조건으로 여러개일 경우 AND REG_USER IN <foreach 
+			collection="arr" item="user" open="(" close=")" separator=","> '${user}' 
+			</foreach> </if> -->
+		<if test="start != '' and end == ''">
+			<!-- 시작일만 있는 경우 -->
+			AND REG_DATE >= TO_DATE('${start}','YYYY-MM-DD')
+		</if>
+		<if test="start == '' and end != ''">
+			<!-- 종료일만 있는 경우 -->
+			<!-- xml 파일 내에서 < 기호를 사용할 경우 시작 태그로 인식되어 파일이 깨져서 동작이 안되므로 기호로 변환 &lt;는 
+				<, &gt;는 >, &nbsp;는 공백으로 치환됨 -->
+			AND REG_DATE &lt;= TO_DATE('${end}','YYYY-MM-DD')+1
+		</if>
+		<if test="start != '' and end != ''">
+			<!-- 둘 다 있는 경우 -->
+			AND REG_DATE BETWEEN TO_DATE('${start}','YYYY-MM-DD') AND
+			TO_DATE('${end}','YYYY-MM-DD')+1
+		</if>
+		ORDER BY NO DESC
+		) M)
+		WHERE RN BETWEEN (('${page}' - 1) * '${rows}') + 1
+		and
+		('${page}' * '${rows}')
+
+	</select>
+
+	<select id="selectBulletinBoardListCount" parameterType="map"
+		resultType="int"> <!-- 페이징 쿼리 -->
+		SELECT COUNT(*) cnt
+		FROM TB_BULLETIN_BOARD
+		WHERE 1=1
+		<if test="txt != ''">
+
+			<if test="type == 'type_Name' "> <!-- 제목 -->
+				AND TITLE LIKE '%'||'${txt}'||'%'
+			</if>
+
+			<if test="type == 'type_User'"> <!-- 작성자 -->
+				AND <!-- LIKE 조건으로 여러개일 경우 -->
+				<foreach collection="arr" item="user" open="(" close=")"
+					separator=" OR">
+					REG_USER LIKE '%'||'${user}'||'%'
+				</foreach>
+
+			</if>
+
+		</if>
+
+		<if test="start != '' and end == ''">
+			<!-- 시작일만 있는 경우 -->
+			AND REG_DATE >= TO_DATE('${start}','YYYY-MM-DD')
+		</if>
+
+		<if test="start == '' and end != ''">
+			<!-- 종료일만 있는 경우 -->
+			<!-- xml 파일 내에서 < 기호를 사용할 경우 시작 태그로 인식되어 파일이 깨져서 동작이 안되므로 기호로 변환 &lt;는 
+				<, &gt;는 >, &nbsp;는 공백으로 치환됨 -->
+
+			AND REG_DATE &lt;= TO_DATE('${end}','YYYY-MM-DD')+1
+		</if>
+
+		<if test="start != '' and end != ''">
+			AND REG_DATE BETWEEN TO_DATE('${start}','YYYY-MM-DD') AND
+			TO_DATE('${end}','YYYY-MM-DD')+1
+		</if>
+
+		ORDER BY NO DESC
+
+	</select>
+
+
+
+
+	<select id="getBulletinBoardDetail" parameterType="map"
+		resultType="map">
+		SELECT NO,TITLE,CONTENTS,REG_USER,TO_CHAR(REG_DATE,'YYYY-MM-DD HH24:MI') REG_DATE   FROM
+		TB_BULLETIN_BOARD
+		WHERE
+		NO ='${no}'
+	</select>
+
+	<update id="bullentinBoardInsert" parameterType="map"> <!-- 게시판 등록 -->
+		<!-- 결과값 리턴안하니깐 필요없음 -->
+		MERGE INTO TB_BULLETIN_BOARD A <!-- 대상 테이블 -->
+		USING (
+		SELECT '${no}' NO,
+		'${title}' TITLE,
+		'${contents}' CONTENTS,
+		'${regUser}' REG_USER,
+		SYSDATE REG_DATE,
+		'${password}' PASSWORD
+		FROM
+		DUAL
+		) B <!-- 넣을 데이터 -->
+
+		ON (A.NO = B.NO)
+		WHEN MATCHED THEN  <!-- ON절에서 비교한 데이터가 존재하면 UPDATE -->
+		UPDATE
+		SET
+		A.TITLE = B.TITLE,
+		A.CONTENTS = B.CONTENTS,
+		A.PASSWORD =
+		B.PASSWORD
+
+		WHEN NOT MATCHED THEN  <!-- 비교한 값이 존재하지 않으면 -->
+
+		INSERT (A.NO, A.TITLE, A.CONTENTS, A.REG_USER, A.PASSWORD,A.REG_DATE)
+		VALUES (TB_BULLETIN_BOARD_SEQ.NEXTVAL, B.TITLE, B.CONTENTS,
+		B.REG_USER, B.PASSWORD,SYSDATE)
+	</update>
+
+	<update id="saveBulletinBoardFileInfo" parameterType="map">
+
+
+		INSERT INTO
+		BULLETIN_BOARD_FILE ( FILE_KEY ,FILE_TEMP_NM
+		,FILE_ORG_NM,REG_DATE,NO)
+		VALUES
+		(LPAD(FILE_SEQ.NEXTVAL, 6, '0'),
+		'${fileTempNm}',
+		'${fileOrgName}',
+		SYSDATE,
+		(SELECT
+		MAX(NO) as NO
+		FROM TB_BULLETIN_BOARD))
+
+	</update>
+
+	<update id="deleteFile" parameterType="map">
+		DELETE FROM
+		BULLETIN_BOARD_FILE WHERE FILE_TEMP_NM ='${fileNm}'
+
+	</update>
+
+
+
+
+	<select id="getBulletinBoardFileOrgName" parameterType="map"
+		resultType="String">
+		SELECT FILE_ORG_NM
+		FROM BULLETIN_BOARD_FILE
+		WHERE
+		FILE_TEMP_NM = '${fileTempName}' AND NO=(SELECT MAX(NO) FROM
+		TB_BULLETIN_BOARD)
+	</select>
+
+	<!-- 지금 이거 고치는중 -->
+	<select id="getFile" parameterType="map" resultType="map">
+
+		<!-- NO가 제일 높은 파일 하나만 뜸 -->
+		SELECT FILE_ORG_NM,FILE_TEMP_NM FROM BULLETIN_BOARD_FILE WHERE
+		NO='${no}'
+		<!-- NO에 대한 조건이 없기때문에, 모든파일 다뜸 -->
+		<!-- SELECT FILE_ORG_NM,FILE_TEMP_NM,NO FROM BULLETIN_BOARD_FILE WHERE 
+			NO IN (SELECT NO FROM TB_BULLETIN_BOARD) -->
+
+		<!-- prameterType="map" 을 넣고 해도 안뜸. 오류는 없음 -->
+		<!-- SELECT FILE_ORG_NM,FILE_TEMP_NM,NO FROM BULLETIN_BOARD_FILE, (SELECT 
+			NO FROM TB_BULLETIN_BOARD WHERE NO='${no}') -->
+
+		<!-- prameterType="map" -->
+		<!-- ORA-01741: 길이가 0인 식별자는 부적합합니다 -->
+		<!-- NO=''로 NO가 안들어가서 -->
+		<!-- SELECT FILE_ORG_NM,FILE_TEMP_NM,A.NO FROM BULLETIN_BOARD_FILE A, (SELECT 
+			NO FROM TB_BULLETIN_BOARD WHERE NO="${no}") B WHERE A.NO=B.NO -->
+
+		<!-- no값 안들어가서 모든 파일 다나옴 -->
+		<!-- SELECT FILE_ORG_NM, FILE_TEMP_NM, (SELECT NO FROM TB_BULLETIN_BOARD 
+			WHERE NO = '${no}') NO FROM BULLETIN_BOARD_FILE -->
+
+	</select>
+	<!-- 지금 이거 고치는중 -->
+
+	<select id="getBullentinBoardPwChk" parameterType="map"
+		resultType="map">  <!-- 비밀번호 암호화 했을때 되는 statement -->
+		SELECT CASE WHEN PASSWORD = '${password}' THEN 'O' ELSE 'X' END AS
+		PASSWORD
+		FROM
+		TB_BULLETIN_BOARD
+		WHERE NO =
+		'${no}'
+
+	</select>
+
+	<update id="bulletinBoardDelete" parameterType="map">
+		DELETE FROM
+		TB_BULLETIN_BOARD WHERE NO='${no}'
+
+	</update>
+
+	<update id="bulletinFileDelete" parameterType="map">
+		DELETE FROM
+		BULLETIN_BOARD_FILE WHERE NO='${no}'
+
+	</update>
+
+	<update id="getViewCount" parameterType="map">
+		UPDATE TB_BULLETIN_BOARD SET VIEW_COUNT = VIEW_COUNT + 1 WHERE NO='${no}'
+	</update>
+
+
+
+
+
+
+</mapper>
