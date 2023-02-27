@@ -44,15 +44,6 @@ public class BoardService {
 		return boardDAO.selectBoardListCount(map);
 	}
 
-	public ArrayList<HashMap<String, Object>> getStationList(HashMap<String, Object> map) {
-		return boardDAO.getStationList(map);
-	}
-
-	public ArrayList<HashMap<String, Object>> getLocationList() {
-		ArrayList<HashMap<String, Object>> list = boardDAO.getLocationList();
-		return list;
-	}
-
 	public ArrayList<HashMap<String, Object>> getLanguageList() {
 		ArrayList<HashMap<String, Object>> list = boardDAO.getLanguageList();
 		return list;

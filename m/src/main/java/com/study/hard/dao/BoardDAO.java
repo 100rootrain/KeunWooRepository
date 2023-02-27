@@ -21,10 +21,6 @@ public interface BoardDAO {
 
 	public int selectBoardListCount(HashMap<String, Object> map);
 
-	public ArrayList<HashMap<String, Object>> getStationList(HashMap<String, Object> map);
-
-	public ArrayList<HashMap<String, Object>> getLocationList();
-
 	public ArrayList<HashMap<String, Object>> getLanguageList();
 
 	public ArrayList<HashMap<String, Object>> getCal(HashMap<String, Object> map);

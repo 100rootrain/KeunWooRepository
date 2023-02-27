@@ -139,16 +139,6 @@
 		WHERE NO = #{no}
 	</delete>
 
-	<select id="getLocationList" resultType="map">
-		SELECT DISTINCT LOC_NM
-		FROM TB_LOC
-		ORDER by LOC_NM 
-	</select>
-
-	<select id="getStationList" resultType="map" parameterType="map">
-		SELECT STTN_NM FROM TB_LOC WHERE LOC_NM='${locNm}'
-	</select>
-
 	<select id="getCal" resultType="map" parameterType="map">
 		SELECT WW,
 

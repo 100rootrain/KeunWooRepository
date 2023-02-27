@@ -143,24 +143,6 @@ public class BoardController {
 		return "webeditor";
 	}
 
-	@RequestMapping(value = "/airPollution", method = RequestMethod.GET)
-	public String airPollution(Locale locale, Model model) { // INNERHTML
-		ArrayList<HashMap<String, Object>> locationList = boardService.getLocationList();
-
-		model.addAttribute("locationList", locationList);
-
-		return "airPollution";
-	}
-
-	@RequestMapping(value = "/airPollution2", method = RequestMethod.GET)
-	public String airPollution2(Locale locale, Model model) {
-		ArrayList<HashMap<String, Object>> locationList = boardService.getLocationList();
-
-		model.addAttribute("locationList", locationList);
-
-		return "airPollution2";
-	}
-
 	@RequestMapping(value = "/translate", method = RequestMethod.GET)
 	public String translate(Locale locale, Model model) {
 
