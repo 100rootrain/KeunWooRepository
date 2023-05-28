@@ -23,16 +23,6 @@ public interface BoardDAO {
 
 	public ArrayList<HashMap<String, Object>> getLanguageList();
 
-	public ArrayList<HashMap<String, Object>> getCal(HashMap<String, Object> map);
-
-	public void insertSch(HashMap<String, Object> map);
-
-	public void insertHoliday(HashMap<String, Object> map);
-
-	public ArrayList<HashMap<String, Object>> getChartData(HashMap<String, Object> map);
-
-	public ArrayList<HashMap<String, Object>> getHolidayChartData(HashMap<String, Object> map);
-
 	public void saveFileInfo(HashMap<String, String> fileMap);
 
 	public String getFileOrgName(HashMap<String, String> fileMap);

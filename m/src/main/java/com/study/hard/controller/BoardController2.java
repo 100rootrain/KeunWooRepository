@@ -100,62 +100,7 @@ public class BoardController2 {
 		return map;
 	}
 
-	@RequestMapping(value = "/getCal", method = RequestMethod.GET)
-	public ArrayList<HashMap<String, Object>> getCal(@RequestParam String yearBox, @RequestParam String monthBox,
-			Locale locale, Model model) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
 
-		map.put("yearBox", yearBox);
-		map.put("monthBox", monthBox);
-
-		System.out.println("getCal : " + yearBox);
-		System.out.println("getCal : " + monthBox);
-
-		ArrayList<HashMap<String, Object>> CalList = boardService.getCal(map);
-		return CalList;
-	}
-
-	@RequestMapping(value = "/insertSch", method = RequestMethod.POST) // 일정
-	public void insertSch(@RequestParam String yearBox, @RequestParam String monthBox, @RequestParam String dateBox,
-			@RequestParam String selStartHour, @RequestParam String selStartMinute, @RequestParam String schdlNm,
-			Locale locale, Model model) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("yearBox", yearBox);
-		map.put("monthBox", monthBox);
-		map.put("dateBox", dateBox);
-		map.put("selStartHour", selStartHour);
-		map.put("selStartMinute", selStartMinute);
-		map.put("schdlNm", schdlNm);
-		boardService.insertSch(map);
-	}
-
-	@RequestMapping(value = "/insertHoliday", method = RequestMethod.POST) // 휴일
-	public void insertHoliday(@RequestParam String yearMonthDate, @RequestParam String holidayNm, Locale locale,
-			Model model) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("yearMonthDate", yearMonthDate);
-		map.put("holidayNm", holidayNm);
-		boardService.insertHoliday(map);
-
-		System.out.println("yearMonthDate : " + yearMonthDate);
-		System.out.println("holidayNm : " + holidayNm);
-	}
-
-	@RequestMapping(value = "/getChartData", method = RequestMethod.GET)
-	public ArrayList<HashMap<String, Object>> getChartData(@RequestParam String gender, Locale locale, Model model) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("gender", gender);
-		ArrayList<HashMap<String, Object>> getChartData = boardService.getChartData(map);
-		return getChartData;
-	}
-
-	@RequestMapping(value = "/getHolidayChartData", method = RequestMethod.GET)
-	public ArrayList<HashMap<String, Object>> getHolidayChartData(Locale locale, Model model) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-
-		ArrayList<HashMap<String, Object>> getHolidayChartData = boardService.getHolidayChartData(map);
-		return getHolidayChartData;
-	}
 
 	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
 	public ArrayList<HashMap<String, String>> uploadFile(MultipartHttpServletRequest request) throws Exception {
