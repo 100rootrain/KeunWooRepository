@@ -26,6 +26,12 @@
 ## 📌 오류 발생 & 해결 
 ****오류1****
 
+Received fatal alert: protocol_version 오류 
+
+VM arguments에
+-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2
+추가
+
 
 ****오류2****
 
