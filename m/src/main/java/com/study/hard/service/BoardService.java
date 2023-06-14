@@ -49,30 +49,6 @@ public class BoardService {
 		return list;
 	}
 
-	public ArrayList<HashMap<String, Object>> getCal(HashMap<String, Object> map) {
-		ArrayList<HashMap<String, Object>> list = boardDAO.getCal(map);
-		return list;
-	}
-
-	public void insertSch(HashMap<String, Object> map) {
-		boardDAO.insertSch(map);
-	}
-
-	public void insertHoliday(HashMap<String, Object> map) {
-		boardDAO.insertHoliday(map);
-	}
-
-	public ArrayList<HashMap<String, Object>> getChartData(HashMap<String, Object> map) {
-		ArrayList<HashMap<String, Object>> list = boardDAO.getChartData(map);
-		return list;
-
-	}
-
-	public ArrayList<HashMap<String, Object>> getHolidayChartData(HashMap<String, Object> map) {
-		ArrayList<HashMap<String, Object>> list = boardDAO.getHolidayChartData(map);
-		return list;
-	}
-
 	// 브라우저에 따른 한글 파일명 처리(화면과 통신하는 메서드가 아니므로 서비스에 위치)
 	public String getFileNm(String browser, String fileNm) {
 		String reFileNm = null;

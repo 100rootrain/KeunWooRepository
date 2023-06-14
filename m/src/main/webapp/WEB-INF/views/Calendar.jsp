@@ -82,6 +82,7 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 		var selYear = date.getFullYear();
 		var selMonth = date.getMonth() + 1;
 
+
 		// 현재년도를 기준으로 호출
 		getYears(selYear);
 		getMonths(selMonth);
@@ -160,8 +161,19 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 
 		console.log("selected_Year : " + selected_Year);
 		console.log("selected_Month :" + selected_Month);
+		
+		$.ajax({
+			url : "getAnniversary", //요청할 url, 주소:포트(http://localhost:8080)는 일반적으로 생략
+			type : "GET", //요청 방식 - GET:조회, POST:입력
+			cache : false, //캐쉬 - 임시로 데이터를 저장할지 여부, 거의 false
+			data : {
+		    	chgYear : $('#yearBox').val(),
+		    	chgMonth : $('#monthBox').val()
 
-		$
+			},
+			success : function(data) { //데이터 송,수신에 성공했을 경우의 동작
+				
+				$
 				.ajax({
 					url : "getCal", //요청할 url, 주소:포트(http://localhost:8080)는 일반적으로 생략
 					type : "GET", //요청 방식 - GET:조회, POST:입력
@@ -444,7 +456,7 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 							t += "</tbody>"
 
 						}
-						$("#t").html(''); /* 달력이 계속 추가되는것 방지 */
+						//$("#t").html(''); /* 달력이 계속 추가되는것 방지 */
 						$("#t").html(t);
 
 						$("#div_2")
@@ -470,6 +482,17 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 								+ error);
 					}
 				});
+
+			},
+			error : function(request, status, error) { // 오류가 발생했을 경우의 동작
+				alert("code:" + request.status + "\n" + "message:"
+						+ request.responseText + "\n" + "error:" + error);
+			}
+		});
+		
+		
+
+
 
 	}
 

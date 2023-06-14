@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.CalendarDAO">
+
+	<select id="getCal" resultType="map" parameterType="map">
+		SELECT WW,
+
+       NVL(TO_CHAR(MAX(SUN)), ' ')           SUN, /* 일요일 */
+       NVL(TO_CHAR(MAX(SUN_HCNT)), ' ')      SUN_HCNT, /*일요일 휴일갯수*/
+       NVL(TO_CHAR(MAX(SUN_HNM)), ' ')       SUN_HNM, /*일요일 휴일명*/
+       NVL(TO_CHAR(MAX(SUN_SCHDL_CNT)), ' ') SUN_SCHDL_CNT, /*일요일 일정 갯수*/
+       NVL(TO_CHAR(MAX(SUN_SCHDL_NM)), ' ')  SUN_SCHDL_NM, /* 일요일 시간순 일정명*/
+       NVL(TO_CHAR(MAX(MON)), ' ')           MON,
+       NVL(TO_CHAR(MAX(MON_HCNT)), ' ')
+                                             MON_HCNT,
+       NVL(TO_CHAR(MAX(MON_HNM)), ' ')       MON_HNM,
+       NVL(TO_CHAR(MAX(MON_SCHDL_CNT)), ' ') MON_SCHDL_CNT,
+       NVL(TO_CHAR(MAX(MON_SCHDL_NM)), ' ')  MON_SCHDL_NM,
+       NVL(TO_CHAR(MAX(TUE)), ' ')           TUE,
+       NVL(TO_CHAR(MAX(TUE_HCNT)), ' ')
+                                             TUE_HCNT,
+       NVL(TO_CHAR(MAX(TUE_HNM)), ' ')       TUE_HNM,
+       NVL(TO_CHAR(MAX(TUE_SCHDL_CNT)), ' ') TUE_SCHDL_CNT,
+       NVL(TO_CHAR(MAX(TUE_SCHDL_NM)), ' ')  TUE_SCHDL_NM,
+       NVL(TO_CHAR(MAX(WED)), ' ')           WED,
+       NVL(TO_CHAR(MAX(WED_HCNT)), ' ')
+                                             WED_HCNT,
+       NVL(TO_CHAR(MAX(WED_HNM)), ' ')       WED_HNM,
+       NVL(TO_CHAR(MAX(WED_SCHDL_CNT)), ' ') WED_SCHDL_CNT,
+       NVL(TO_CHAR(MAX(WED_SCHDL_NM)), ' ')  WED_SCHDL_NM,
+       NVL(TO_CHAR(MAX(THU)), ' ')           THU,
+       NVL(TO_CHAR(MAX(THU_HCNT)), ' ')
+                                             THU_HCNT,
+       NVL(TO_CHAR(MAX(THU_HNM)), ' ')       THU_HNM,
+       NVL(TO_CHAR(MAX(THU_SCHDL_CNT)), ' ') THU_SCHDL_CNT,
+       NVL(TO_CHAR(MAX(THU_SCHDL_NM)), ' ')  THU_SCHDL_NM,
+       NVL(TO_CHAR(MAX(FRI)), ' ')           FRI,
+       NVL(TO_CHAR(MAX(FRI_HCNT)), ' ')
+                                             FRI_HCNT,
+       NVL(TO_CHAR(MAX(FRI_HNM)), ' ')       FRI_HNM,
+       NVL(TO_CHAR(MAX(FRI_SCHDL_CNT)), ' ') FRI_SCHDL_CNT,
+       NVL(TO_CHAR(MAX(FRI_SCHDL_NM)), ' ')  FRI_SCHDL_NM,
+       NVL(TO_CHAR(MAX(SAT)), ' ')           SAT,
+       NVL(TO_CHAR(MAX(SAT_HCNT)), ' ')
+                                             SAT_HCNT,
+       NVL(TO_CHAR(MAX(SAT_HNM)), ' ')       SAT_HNM,
+       NVL(TO_CHAR(MAX(SAT_SCHDL_CNT)), ' ') SAT_SCHDL_CNT,
+       NVL(TO_CHAR(MAX(SAT_SCHDL_NM)), ' ')  SAT_SCHDL_NM
+FROM (
+         SELECT TO_CHAR(SDAY + 1, 'IW')                         WW, /* 주차*/
+                DECODE(TO_CHAR(SDAY, 'D'), 1,
+                       A.CNT)                                   SUN, /* 여기서*/
+                DECODE(TO_CHAR(SDAY, 'D'), 2, A.CNT)            MON,
+                DECODE(TO_CHAR(SDAY, 'D'), 3, A.CNT)            TUE,
+                DECODE(TO_CHAR(SDAY, 'D'), 4,
+                       A.CNT)                                   WED,
+                DECODE(TO_CHAR(SDAY, 'D'), 5, A.CNT)            THU,
+                DECODE(TO_CHAR(SDAY, 'D'), 6, A.CNT)            FRI,
+                DECODE(TO_CHAR(SDAY, 'D'), 7,
+                       A.CNT)                                   SAT, /* 여기까지는 달력에 출력할 날짜값*/
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 1,
+                       HCNT)                                    SUN_HCNT, /* 여기서*/
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 2, HCNT)
+                                                                MON_HCNT,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 3, HCNT)       TUE_HCNT,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 4, HCNT)       WED_HCNT,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 5, HCNT)       THU_HCNT,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 6, HCNT)       FRI_HCNT,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 7, HCNT)       SAT_HCNT, /* 여기까지는 해당 날짜에
+		휴일명 갯수*/
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 1, HOLIDAY_NM) SUN_HNM, /*
+		여기서*/
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 2, HOLIDAY_NM) MON_HNM,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 3, HOLIDAY_NM) TUE_HNM,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 4, HOLIDAY_NM) WED_HNM,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 5, HOLIDAY_NM) THU_HNM,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 6, HOLIDAY_NM) FRI_HNM,
+                DECODE(TO_CHAR(HOLIDAY_DT, 'D'), 7, HOLIDAY_NM) SAT_HNM, /* 여기까지는 해당
+		날짜의 휴일명*/
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 1, SCHDL_CNT)    SUN_SCHDL_CNT,
+             /* 여기서*/
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 2, SCHDL_CNT)    MON_SCHDL_CNT,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 3, SCHDL_CNT)    TUE_SCHDL_CNT,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 4, SCHDL_CNT)    WED_SCHDL_CNT,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 5, SCHDL_CNT)    THU_SCHDL_CNT,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 6, SCHDL_CNT)    FRI_SCHDL_CNT,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 7, SCHDL_CNT)    SAT_SCHDL_CNT, /* 여기까지는
+		해당 날짜에 스케줄 갯수*/
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 1, SCHDL_NM)
+                                                                SUN_SCHDL_NM, /* 여기서*/
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 2, SCHDL_NM)
+                                                                MON_SCHDL_NM,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 3, SCHDL_NM)     TUE_SCHDL_NM,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 4, SCHDL_NM)     WED_SCHDL_NM,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 5, SCHDL_NM)     THU_SCHDL_NM,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 6, SCHDL_NM)     FRI_SCHDL_NM,
+                DECODE(TO_CHAR(SCHDL_DT, 'D'), 7, SCHDL_NM)     SAT_SCHDL_NM /* 여기까지는 해당
+		날짜의 시간순 스케줄명*/
+         FROM (SELECT *
+               FROM (/*다른건 건드릴 필요없음 조회할 날짜만 YYYYMM 형식으로
+		3군데에 넣어주면 됨*/
+                        SELECT LEVEL     CNT,
+                               TO_DATE('${yearBox}' || LPAD('${monthBox}', 2, '0'), 'YYYYMM') +
+                               LEVEL - 1 SDAY
+                        FROM DUAL A
+                        CONNECT BY LEVEL
+                                       BETWEEN 0 AND
+                                               LAST_DAY(TO_DATE('${yearBox}' || LPAD('${monthBox}', 2, '0'),
+                                                                'YYYYMM')) -
+                                               TRUNC(TO_DATE(${yearBox} || LPAD('${monthBox}', 2, '0'), 'YYYYMM'),
+                                                     'MM') +
+                                               1) A,
+                    (/* 휴일 테이블*/
+                        SELECT TO_DATE(HOLIDAY_DT, 'YYYYMMDD')               HOLIDAY_DT,
+                               COUNT(*)                                      HCNT,
+                               listagg(HOLIDAY_NM, '<![CDATA[<br>]]>')
+                                       WITHIN GROUP (ORDER BY HOLIDAY_NM) AS HOLIDAY_NM
+                        FROM TB_HOLIDAY
+                        WHERE to_CHAR(to_date(HOLIDAY_DT, 'YYYYMMDD'), 'YYYYMM') =
+                              '${yearBox}' || LPAD('${monthBox}', 2, '0')
+                        GROUP BY HOLIDAY_DT) B,
+                    (/* 스케줄
+		테이블*/
+                        select TO_DATE(SCHDL_DT, 'YYYYMMDD')             SCHDL_DT,
+                               count(*)                                  SCHDL_CNT,
+                               listagg(to_char(to_date(SCHDL_TM, 'HH24MI'), 'HH24:MI') || ' ' ||
+                                       SCHDL_NM, '&lt;br>')
+                                       within group ( order by SCHDL_TM) SCHDL_NM
+                        from TB_SCHEDULE
+                        WHERE to_CHAR(to_date(SCHDL_DT, 'YYYYMMDD'), 'YYYYMM') =
+                              '${yearBox}' || LPAD('${monthBox}', 2, '0')
+                        GROUP BY SCHDL_DT) C
+               WHERE A.SDAY =
+                     B.HOLIDAY_DT(+) /* 해당 월의 날짜값과 휴일 데이터를 아우터 조인한다*/
+                 AND A.SDAY =
+                     C.SCHDL_DT(+) /* 해당 월의 날짜값과 휴일 데이터를 아우터 조인한다*/
+               ORDER BY CNT) A)
+GROUP BY WW
+ORDER BY TO_NUMBER(NVL(TRIM(SUN), 0)), TO_NUMBER(NVL(TRIM(MON), 0)),
+         TO_NUMBER(NVL(TRIM(TUE), 0)), TO_NUMBER(NVL(TRIM(WED), 0)),
+         TO_NUMBER(NVL(TRIM(THU), 0)), TO_NUMBER(NVL(TRIM(FRI), 0)),
+         TO_NUMBER(NVL(TRIM(SAT), 0))
+	</select>
+
+	<update id="insertSch" parameterType="map">
+		INSERT INTO TB_SCHEDULE
+		(SCHDL_ID,
+		SCHDL_DT,
+		SCHDL_TM,
+		SCHDL_NM)
+		VALUES
+		(TB_SCHEDULE_SEQ.NEXTVAL,'${yearBox}'||
+		LPAD('${monthBox}',2,0)||'${dateBox}','${selStartHour}'||'${selStartMinute}','${schdlNm}')
+	</update>
+
+	<update id="insertHoliday" parameterType="map">
+		INSERT INTO TB_HOLIDAY
+		(HOLIDAY_ID,
+		HOLIDAY_DT,
+		HOLIDAY_NM
+		)
+		VALUES
+		(TB_HOLIDAY_SEQ.NEXTVAL,'${yearMonthDate}','${holidayNm}')
+	</update>
+
+	<select id="getHolidayChartData" resultType="map">
+		SELECT MONTH,
+		COUNT(MONTH) HOLIDAY_CNT FROM (
+		SELECT CASE WHEN MONTH = '01' THEN '1월'
+		WHEN MONTH = '02' THEN '2월'
+		WHEN MONTH = '03' THEN '3월'
+		WHEN MONTH =
+		'04' THEN '4월'
+		WHEN MONTH = '05' THEN '5월'
+		WHEN MONTH = '06' THEN '6월'
+		WHEN MONTH = '07' THEN '7월'
+		WHEN MONTH = '08' THEN '8월'
+		WHEN MONTH =
+		'09' THEN '9월'
+		WHEN MONTH = '10' THEN '10월'
+		WHEN MONTH = '11' THEN '11월'
+		ELSE '12월' END AS MONTH
+		FROM (SELECT SUBSTR(HOLIDAY_DT, 5, 2) MONTH
+		FROM TB_HOLIDAY))
+		GROUP BY MONTH
+	</select>
+	
+	<select id="isDuplicateHoliday" parameterType="map" resultType="map">
+		SELECT HOLIDAY_DT,HOLIDAY_NM
+		FROM TB_HOLIDAY
+		WHERE HOLIDAY_DT=#{yearMonthDate} AND HOLIDAY_NM=#{holidayNm}
+		GROUP BY HOLIDAY_DT, HOLIDAY_NM
+		HAVING COUNT(*)>=1 
+	</select>
+
+
+</mapper>

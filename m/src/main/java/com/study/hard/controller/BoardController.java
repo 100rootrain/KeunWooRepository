@@ -152,11 +152,6 @@ public class BoardController {
 		return "translate";
 	}
 
-	@RequestMapping(value = "/Calendar", method = RequestMethod.GET)
-	public String Calendar(Locale locale, Model model) {
-
-		return "Calendar";
-	}
 
 	@RequestMapping(value = "/Calendar2", method = RequestMethod.GET)
 	public String Calendar2(Locale locale, Model model) {
@@ -164,17 +159,7 @@ public class BoardController {
 		return "Calendar2";
 	}
 
-	@RequestMapping(value = "/addScheduleForm", method = RequestMethod.GET)
-	public String addScheduleForm(Locale locale, Model model) {
 
-		return "addScheduleForm";
-	}
-
-	@RequestMapping(value = "/addHolidayForm", method = RequestMethod.GET)
-	public String addHolidayForm(Locale locale, Model model) {
-
-		return "addHolidayForm";
-	}
 
 	@RequestMapping(value = "/chart", method = RequestMethod.GET)
 	public String chart(Locale locale, Model model) {
@@ -182,11 +167,6 @@ public class BoardController {
 		return "chart";
 	}
 
-	@RequestMapping(value = "/holidayChart", method = RequestMethod.GET)
-	public String holidayChart(Locale locale, Model model) {
-
-		return "holidayChart";
-	}
 
 	@RequestMapping(value = "/fileTransfer", method = RequestMethod.GET)
 	public String fileTransfer(Locale locale, Model model) {
