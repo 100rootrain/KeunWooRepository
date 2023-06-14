@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 맵핑될 DAO 인터페이스의 패키지명 포함 Full name으로 해당 mapper.xml 파일에 연결된다. -->
+<mapper namespace="com.study.hard.dao.HDAO">
+
+	<!-- 1. DAO에서 실행된 메서드명과 동일한 id를 가진 쿼리가 실행된다. 그러므로 id 속성은 DAO 의 메소드명과 같아야 
+		한다. 2. parameterType은 string(소문자) 혹은 VO명 2. resultType은 VO의 상단에 선언한 alias명으로 
+		연결되므로 alias와 일치해야 한다. 3. 조회된 컬럼명과 resultType의 VO 안의 변수명도 일치해야 함 4. 컬럼명에 _가 
+		붙는 경우 자동으로 다음 문자가 대문자로 변환되어 VO에 들어감 ex> REG_DATE -> regDate, REG_USER -> 
+		regUSer -->
+
+	<select id="selectHList" parameterType="map" resultType="hVO">
+		SELECT
+		ID, NAME, GRADE, CLASS1,
+		NO
+		FROM XTB_STUDENT
+	</select>
+
+	<select id="selectHDetail" parameterType="string"
+		resultType="hVO">
+		SELECT
+		ID,
+		NAME,
+		CASE
+		WHEN SUBSTR(SSN1, 7, 1) IN ( '1', '3' ) THEN '남자'
+		WHEN SUBSTR(SSN1, 7, 1) IN ( '2', '4' ) THEN '여자'
+		ELSE 'null'
+		END GENDER,
+		EMAIL,
+		CONTACT1,
+		CONTACT2,
+		CONTACT3,
+		ADDRESS,
+		SCHOOL1,
+		SCHOOL2,
+		SCHOOL3,
+		GRADE,
+		CLASS1,
+		NO,
+		ENTRY_DATE,
+		TO_CHAR(RESIGN_DATE,'YYYY-MM-DD'),
+		REMARK
+		FROM XTB_STUDENT
+		WHERE ID = #{id}
+	</select>
+
+
+	<insert id="hinsertBoard" parameterType="hVO">
+		INSERT INTO XTB_STUDENT
+		(
+		ID,
+		NAME,
+		SSN1,
+		EMAIL,
+		CONTACT1,
+		CONTACT2,
+		CONTACT3,
+		ADDRESS,
+		SCHOOL1,
+		SCHOOL2,
+		SCHOOL3,
+		GRADE,
+		CLASS1,
+		NO,
+		ENTRY_DATE,
+		RESIGN_DATE,
+		REMARK
+		)
+		VALUES
+		(
+		'${id}',
+		'${name}',
+		'${ssn1}',
+		'${email}',
+		'${contact1}',
+		'${contact2}',
+		'${contact3}',
+		'${address}',
+		'${school1}',
+		'${school2}',
+		'${school3}',
+		'${grade}',
+		'${class1}',
+		'${no}',
+		SYSDATE,
+		to_date('${resignDate}','YYYYMMDD'),
+		'${remark}'
+		)
+	</insert>
+
+	<update id="hupdate" parameterType="map">
+		UPDATE XTB_STUDENT SET
+		NAME='${name}',
+		ENTRY_DATE=SYSDATE,
+		SSN1= '${ssn1}',
+		EMAIL='${email}',
+		CONTACT1='${contact1}',
+		CONTACT2='${contact2}',
+		CONTACT3='${contact3}',
+		ADDRESS='${address}',
+		SCHOOL1='${school1}',
+		SCHOOL2='${school2}',
+		SCHOOL3='${school3}',
+		GRADE='${grade}',
+		CLASS1='${class1}',
+		NO='${no}',
+		RESIGN_DATE=to_date('${resignDate}','YYYYMMDD'),
+		REMARK='${remark}'
+		WHERE ID='${id}'
+	</update>
+
+	<delete id="hdeleteBoard" parameterType="string">
+		DELETE FROM XTB_STUDENT
+		WHERE id = #{id}
+	</delete>
+
+
+
+
+</mapper>
