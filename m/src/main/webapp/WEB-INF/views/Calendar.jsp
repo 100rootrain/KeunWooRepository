@@ -218,7 +218,7 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 								sun_color = "style='background-color: #f0d6d0'" //일요일 
 							}
 
-							var sun_hnm = data[i].SUN_HNM; /* 휴일명 */
+							var sun_hnm = data[i].SUN_HNM + "<input type='hidden' class='sunMrg' value='"+data[i].SUN_HNM+"'>"; /* 휴일명 */
 							var sun_hnm_color = data[i].SUN_HCNT > 0 ? "<div style='color:red;font-weight:bold;'>" /* 휴일명 속성 */
 									: "<div style='color:red;font-weight:normal'>";
 							var sun_schdl_nm = data[i].SUN_SCHDL_NM; /* 일정명 */
@@ -414,8 +414,8 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 							/* 일요일 */
 							t += "<td "+sun_color+"><font size='5'>"
 									+ sun_hnm_color + "<b>" + sun + "</b>"
-									+ "</font><br>" + sun_hnm + "</div><br>"
-									+ sun_schdl_nm + "</td>"
+									+ "</font><div contenteditable='true' class='editHnm'>" + sun_hnm + "</div></div><div>"
+									+ sun_schdl_nm + "</div></td>"
 
 							/* 월요일 */
 							t += "<td "+mon_color+"><font size='5'>"
@@ -517,6 +517,8 @@ th:nth-last-child(1) { /* th의 자식중 마지막 요소 */
 		//화면, id, 너비 높이 왼쪽 위 // 팝업 3개 열고 닫고 부모호출 
 
 	}
+	
+
 </script>
 <title>달력</title>
 </head>

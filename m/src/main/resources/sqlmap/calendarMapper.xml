@@ -165,7 +165,24 @@ ORDER BY TO_NUMBER(NVL(TRIM(SUN), 0)), TO_NUMBER(NVL(TRIM(MON), 0)),
 		VALUES
 		(TB_HOLIDAY_SEQ.NEXTVAL,'${yearMonthDate}','${holidayNm}')
 	</update>
-
+<!-- 달력 메인에서 각 일자별로 클릭해서 수정가능해질때 쓸것(삽입,수정 둘다 가능해야돼서)	
+	<update id="insertHoliday" parameterType="map">
+	MERGE INTO TB_HOLIDAY A
+	USING (SELECT HOLIDAY_ID     HOLIDAY_ID,
+	              HOLIDAY_DT     HOLIDAY_DT,
+	              '${holidayNm}' HOLIDAY_NM
+	       from DUAL) B
+	ON (A.HOLIDAY_ID = B.HOLIDAY_ID)
+	WHEN MATCHED THEN
+	    UPDATE
+	    SET A.HOLIDAY_ID = B.HOLIDAY_ID,
+	        A.HOLIDAY_DT = B.HOLIDAY_DT,
+	        A.HOLIDAY_NM = B.HOLIDAY_NM
+	WHEN NOT MATCHED THEN
+	    INSERT (A.HOLIDAY_ID, A.HOLIDAY_DT, A.HOLIDAY_NM)
+	    VALUES (TB_HOLIDAY_SEQ.NEXTVAL, '${yearMonthDate}', ${holidayNm});
+	</update>
+-->
 	<select id="getHolidayChartData" resultType="map">
 		SELECT MONTH,
 		COUNT(MONTH) HOLIDAY_CNT FROM (
@@ -187,7 +204,7 @@ ORDER BY TO_NUMBER(NVL(TRIM(SUN), 0)), TO_NUMBER(NVL(TRIM(MON), 0)),
 		FROM TB_HOLIDAY))
 		GROUP BY MONTH
 	</select>
-	
+
 	<select id="isDuplicateHoliday" parameterType="map" resultType="map">
 		SELECT HOLIDAY_DT,HOLIDAY_NM
 		FROM TB_HOLIDAY

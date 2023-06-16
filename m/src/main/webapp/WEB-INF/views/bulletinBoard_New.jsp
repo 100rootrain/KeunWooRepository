@@ -142,6 +142,21 @@ td {
 		});
 
 	}
+	
+	function handleKeyPress(event) {
+		  // Ctrl + S를 눌렀을 때 실행할 작업을 여기에 작성합니다.
+		  if (event.ctrlKey && event.key === 's') {
+		    // 작업 실행
+		    event.preventDefault(); // 기본 저장 동작을 취소합니다.
+		    
+
+		    // 여기에 실제 저장 작업을 추가합니다.
+		    fnSave();
+		  }
+		}
+
+		// window 객체에 키 이벤트 리스너 추가
+		window.addEventListener('keydown', handleKeyPress);
 </script>
 </head>
 <body>

@@ -42,10 +42,22 @@ body {
 							}
 						});
 			});
+	
+	
 
 	function fnSchAdd() {
 		var yearMonthDate = $("#yearMonthDate").val();
 		var holidayNm = $("#holidayNm").val();
+
+		if(yearMonthDate.length<8){
+			alert("옳바른 날짜를 입력해주세요. 날짜의 형식은 YYYYMMDD입니다. 현재 날짜의 길이수는"+yearMonthDate.toString().length+"입니다.");
+			return false;
+		}
+
+		if(holidayNm == ''){
+			alert("휴일명을 입력해주세요.");
+			return false;
+		}
 
 		$.ajax({
 			url : "insertHoliday", //요청할 url, 주소:포트(http://localhost:8080)는 일반적으로 생략
@@ -76,11 +88,19 @@ body {
 			}
 		});
 	}
+
+	function emptyChk(){
+
+		var yearMonthDate = $("#yearMonthDate").val();
+		var holidayNm = $("#holidayNm").val();
+
+
+	}
 </script>
 <title>휴일 등록</title>
 </head>
 <body>
-	<input type="text" id="yearMonthDate" value="${yearMonthDate}">
+	<input type="text" id="yearMonthDate" value="${yearMonthDate}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
 	<br>
 	<br>
 	<input type="text" id="holidayNm">

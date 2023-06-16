@@ -117,7 +117,7 @@ public class CalendarRestController {
 //	  }
     
 	
-	
+	//selenium으로 공휴일 데이터 긁어오기
 	@RequestMapping(value = "/getAnniversary", method = RequestMethod.GET)
 	public void getAnniversary(@RequestParam String chgYear, @RequestParam String chgMonth,
 			Locale locale, Model model) {
@@ -158,18 +158,17 @@ public class CalendarRestController {
                 
                String holidayDate = nyear + nmonth + ndate;
 
-               log.info("nyear: " + nyear);
-               log.info("nmonth: " + nmonth);
-               log.info("ndate: " + ndate);
                log.info("title : " + title);
                log.info("holidayDate : " + holidayDate);
                
-               if (holidayDate != null && !holidayDate.isEmpty()) {
-            	   // 중복 체크를 수행하여 이미 저장된 휴일인지 확인
+               if (holidayDate != null && !holidayDate.isEmpty() && title != null && !title.isEmpty()) {
                    anniversaryMap.put("yearMonthDate", holidayDate);
                    anniversaryMap.put("holidayNm", title);
+				   log.info("YYYYMMDD: " + holidayDate);
+				   log.info("휴일명: " + title);
                    
                    ArrayList<HashMap<String, Object>> duplicateHolidays = calendarService.isDuplicateHoliday(anniversaryMap);
+
                    if (duplicateHolidays != null && duplicateHolidays.size() > 0) {
                        // 이미 저장된 휴일인 경우, 중복 처리를 수행하거나 예외 처리를 진행할 수 있습니다.
                        log.info("Duplicate holiday: " + holidayDate + ", " + title);
@@ -184,6 +183,9 @@ public class CalendarRestController {
                    
                } else {
                    // holidayDate 값이 없는 경우
+
+				   log.info("휴일을 등록 할 수 없습니다. 날짜를 입력해주세요.");
+
                   
                }
 
